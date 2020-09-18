@@ -1,0 +1,24 @@
+parameters:
+  ho_peter1018.presigned_filemanager.signer.aws_s3_v3: 'HoPeter1018\PresignedFilemanagerBundle\Services\Signer\AwsS3V3Signer'
+  ho_peter1018.presigned_filemanager.signer.local: 'HoPeter1018\PresignedFilemanagerBundle\Services\Signer\LocalSigner'
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  HoPeter1018\PresignedFilemanagerBundle\Command\:
+    resource: '../../Command/*'
+    tags: ['console.command']
+
+  HoPeter1018\PresignedFilemanagerBundle\Services\Manager\ManagerRegistry:
+    class: HoPeter1018\PresignedFilemanagerBundle\Services\Manager\ManagerRegistry
+
+  HoPeter1018\PresignedFilemanagerBundle\Services\Signer\SignerRegistry:
+    class: HoPeter1018\PresignedFilemanagerBundle\Services\Signer\SignerRegistry
+
+  HoPeter1018\PresignedFilemanagerBundle\Controller\DefaultController:
+    class: HoPeter1018\PresignedFilemanagerBundle\Controller\DefaultController
+    arguments:
+      - "@event_dispatcher"

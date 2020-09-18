@@ -1,0 +1,33 @@
+hopeter1018_presigned_filemanager_homepage:
+  path:     /presigned-filemanager
+  defaults: { _controller: HoPeter1018PresignedFilemanagerBundle:Default:index }
+  requirements:
+    manager: .+
+
+hopeter1018_presigned_filemanager_get_presigned_url:
+  path:     /presigned-filemanager/get-presigned-url
+  methods:   GET
+  defaults:
+    _controller: HoPeter1018PresignedFilemanagerBundle:Default:getPresignedUrl
+  requirements:
+    manager: .+
+
+hopeter1018_presigned_filemanager_post_uploaded_meta:
+  path:     /presigned-filemanager/post-uploaded-meta
+  methods:   POST
+  defaults:
+    _controller: HoPeter1018PresignedFilemanagerBundle:Default:postUploadedMeta
+  requirements:
+    manager: .+
+
+hopeter1018_presigned_filemanager_local_post_upload:
+  path:     /presigned-filemanager/local/post-upload
+  methods:   POST
+  defaults:
+    _controller: HoPeter1018PresignedFilemanagerBundle:Local:postUpload
+
+hopeter1018_presigned_filemanager_local_get:
+  path:     /presigned-filemanager/local/get/{path}
+  methods:   GET
+  defaults:
+    _controller: HoPeter1018PresignedFilemanagerBundle:Local:get
