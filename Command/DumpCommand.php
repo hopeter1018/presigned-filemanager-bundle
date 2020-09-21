@@ -11,10 +11,12 @@ namespace HoPeter1018\PresignedFilemanagerBundle\Command;
 use HoPeter1018\PresignedFilemanagerBundle\Services\Manager\ManagerRegistry;
 use HoPeter1018\PresignedFilemanagerBundle\Services\Signer\SignerRegistry;
 use Symfony\Component\Console\Command\Command;
-// use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+// use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class DumpCommand extends Command
 {
@@ -24,10 +26,14 @@ class DumpCommand extends Command
     /** @var ManagerRegistry */
     protected $managerRegistry;
 
-    public function __construct(SignerRegistry $signerRegistry, ManagerRegistry $managerRegistry)
+    /** @var UrlGeneratorInterface */
+    protected $router;
+
+    public function __construct(SignerRegistry $signerRegistry, ManagerRegistry $managerRegistry, UrlGeneratorInterface $router)
     {
         $this->signerRegistry = $signerRegistry;
         $this->managerRegistry = $managerRegistry;
+        $this->router = $router;
 
         parent::__construct();
     }
@@ -46,6 +52,20 @@ class DumpCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title('[hopeter1018] ');
 
+        $request = new Request(
+          ['_GET' => 1],
+          ['_POST' => 2, 'public' => false, 'uploadPathPrefix' => 'abc'],
+          [],
+          ['_COOKIE' => 3],
+          [],
+          ['_SERVER' => 3]
+        );
+        dump($request->isMethod('GET'));
+        dump($request->request->all());
+
+        // echo $this->router->generate('hopeter1018_presigned_filemanager_get_presigned_url', [
+        //   'manager' => 'aws_s3_service',
+        // ]);
         // dump($this->signerRegistry->getAll());
         // foreach ($this->signerRegistry->getAll() as $key => $signer) {
         //     dump($key);
@@ -53,7 +73,7 @@ class DumpCommand extends Command
         // }
         foreach ($this->managerRegistry->getAll() as $key => $manager) {
             dump($key);
-            dump($manager);
+            dump($manager->sanitizePresign(false, $request->request->all()));
         }
 
         $io->success('Done');

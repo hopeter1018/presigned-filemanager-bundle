@@ -10,9 +10,13 @@ namespace HoPeter1018\PresignedFilemanagerBundle;
 
 final class Events
 {
+    const BEFORE_PRESIGN_SANITIZE = 'presigned_filemanager.before_presign_sanitize';
+
     const BEFORE_PRESIGN = 'presigned_filemanager.before_presign';
 
     const AFTER_PRESIGN = 'presigned_filemanager.after_presign';
+
+    const BEFORE_POST_UPLOAD_SANITIZE = 'presigned_filemanager.before_post_upload_sanitize';
 
     const BEFORE_POST_UPLOAD = 'presigned_filemanager.before_post_upload';
 

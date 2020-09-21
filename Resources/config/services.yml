@@ -12,6 +12,10 @@ services:
     resource: '../../Command/*'
     tags: ['console.command']
 
+  HoPeter1018\PresignedFilemanagerBundle\Repository\:
+    resource: '../../Repository/*'
+    tags: ['doctrine.repository_service']
+
   HoPeter1018\PresignedFilemanagerBundle\Services\Manager\ManagerRegistry:
     class: HoPeter1018\PresignedFilemanagerBundle\Services\Manager\ManagerRegistry
 

@@ -2,13 +2,15 @@
 
 namespace HoPeter1018\PresignedFilemanagerBundle\DependencyInjection;
 
-use HoPeter1018\PresignedFilemanagerBundle\Services\Manager\DefaultManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use HoPeter1018\PresignedFilemanagerBundle\Services\Manager\ManagerInterface;
 use HoPeter1018\PresignedFilemanagerBundle\Services\Signer\SignerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -71,27 +73,68 @@ class HoPeter1018PresignedFilemanagerExtension extends Extension implements Prep
                     throw new \Exception("Parameter {$name} must be a valid php class implementing interface `SignerInterface`");
                 }
             }
+            if (strstr($name, 'ho_peter1018.presigned_filemanager.manager')) {
+                $class = new \ReflectionClass($value);
+                if ($class->implementsInterface(ManagerInterface::class)) {
+                    $signerMap[$name] = $value;
+                } else {
+                    throw new \Exception("Parameter {$name} must be a valid php class implementing interface `ManagerInterface`");
+                }
+            }
         }
 
         foreach ($config['signers'] as $key => $signer) {
             if (isset($signer['service'])) {
+                $container->setAlias("ho_peter1018.presigned_filemanager.signer.{$key}", substr($signer['service'], 1));
             } else {
-                $definition = $container->register("ho_peter1018.presigned_filemanager.signer.{$key}", $container->getParameter('ho_peter1018.presigned_filemanager.signer.'.$signer['signer']));
-                foreach ($signer['signer_argument'] as $argument) {
-                    if (strstr($argument, '@')) {
-                        $definition->addArgument(new Reference(substr($argument, 1)));
-                    } else {
-                        $definition->addArgument($argument);
+                $signerClass = class_exists($signer['signer']) ? $signer['signer'] : $container->getParameter('ho_peter1018.presigned_filemanager.signer.'.$signer['signer']);
+                $definition = $container->register("ho_peter1018.presigned_filemanager.signer.{$key}", $signerClass)
+                  ->addTag('ho_peter1018.presigned_filemanager.services.signer_pool');
+
+                if ($signer['signer_argument']) {
+                    foreach ($signer['signer_argument'] as $argument) {
+                        $this->addDefinitionArgument($container, $definition, $argument);
                     }
                 }
-                $definition->addTag('ho_peter1018.presigned_filemanager.services.signer_pool');
             }
         }
 
         foreach ($config['managers'] as $key => $manager) {
-            $container->register("ho_peter1018.presigned_filemanager.manager.{$key}", DefaultManager::class)
-                ->addTag('ho_peter1018.presigned_filemanager.services.manager_pool')
-                ->addArgument($manager);
+            if (isset($manager['service'])) {
+                $container->setAlias("ho_peter1018.presigned_filemanager.manager.{$key}", substr($manager['service'], 1));
+            } else {
+                $managerClass = class_exists($manager['manager']) ? $manager['manager'] : $container->getParameter('ho_peter1018.presigned_filemanager.manager.'.$manager['manager']);
+                $definition = $container->register("ho_peter1018.presigned_filemanager.manager.{$key}", $managerClass)
+                  ->addTag('ho_peter1018.presigned_filemanager.services.manager_pool');
+
+                $this->addDefinitionArgument($container, $definition, new Reference(EventDispatcherInterface::class));
+                $this->addDefinitionArgument($container, $definition, new Reference('ho_peter1018.presigned_filemanager.signer.'.$manager['signer']));
+                $this->addDefinitionArgument($container, $definition, new Reference(ManagerRegistry::class));
+                $this->addDefinitionArgument($container, $definition, new Reference('doctrine.orm.'.$manager['connection'].'_entity_manager'));
+                $this->addDefinitionArgument($container, $definition, $manager['connection']);
+                $this->addDefinitionArgument($container, $definition, $manager['entity_class']);
+                $this->addDefinitionArgument($container, $definition, $manager['allowed_get_parameters']);
+                $this->addDefinitionArgument($container, $definition, $manager['allowed_post_parameters']);
+
+                if ($manager['manager_argument']) {
+                    foreach ($manager['manager_argument'] as $name => $argument) {
+                        $this->addDefinitionArgument($container, $definition, $argument);
+                    }
+                }
+            }
+        }
+    }
+
+    protected function addDefinitionArgument($container, &$definition, $argument)
+    {
+        if (is_array($argument)) {
+            $definition->addArgument($argument);
+        } elseif (strstr($argument, '@')) {
+            $definition->addArgument(new Reference(substr($argument, 1)));
+        } elseif ('%' === substr($argument, 0, 1) and '%' === substr($argument, -1)) {
+            $definition->addArgument($container->getParameter(substr($argument, 1, -1)));
+        } else {
+            $definition->addArgument($argument);
         }
     }
 }

@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace HoPeter1018\PresignedFilemanagerBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -17,12 +16,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class LocalController extends Controller
 {
     public function postUploadAction(Request $request, string $manager)
-    {
-        return new Response('', 204);
-        // return new JsonResponse([]);
-    }
-
-    public function bucketPresignedPostAction(Request $request)
     {
         $options = $request->request->get('options');
         $uploadPathPrefix = $request->request->get('uploadPathPrefix');
@@ -38,7 +31,6 @@ class LocalController extends Controller
             $file = $request->files->get('file');
 
             dump($key);
-            dump($key);
             $fullpath = $this->getPath().'/'.str_replace('${filename}', $file->getClientOriginalName(), $key);
             $file->move(dirname($fullpath), basename($fullpath));
         }
@@ -46,7 +38,7 @@ class LocalController extends Controller
         return new Response('', 204);
     }
 
-    public function bucketPresignedAction(Request $request, $path)
+    public function getAction(Request $request, $path)
     {
         // $serviceId = $request->request->get('__');
         // /** @var FileSystemProviderInterface */
