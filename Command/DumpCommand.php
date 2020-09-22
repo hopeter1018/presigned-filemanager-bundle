@@ -63,9 +63,9 @@ class DumpCommand extends Command
         dump($request->isMethod('GET'));
         dump($request->request->all());
 
-        // echo $this->router->generate('hopeter1018_presigned_filemanager_get_presigned_url', [
-        //   'manager' => 'aws_s3_service',
-        // ]);
+        dump($this->router->generate('hopeter1018_presigned_filemanager_get_presigned_url', [
+          'manager' => 'aws_s3_service',
+        ]));
         // dump($this->signerRegistry->getAll());
         // foreach ($this->signerRegistry->getAll() as $key => $signer) {
         //     dump($key);
@@ -73,7 +73,14 @@ class DumpCommand extends Command
         // }
         foreach ($this->managerRegistry->getAll() as $key => $manager) {
             dump($key);
+            dump($manager->sanitizeList($request->request->all()));
+            dump($manager->list($request->request->all()));
+            dump($manager->sanitizeRemove($request->request->all()));
+            dump($manager->remove($request->request->all()));
             dump($manager->sanitizePresign(false, $request->request->all()));
+            dump($manager->presign(false, $request->request->all()));
+            dump($manager->sanitizeUploaded($request->request->all()));
+            dump($manager->uploaded($request->request->all()));
         }
 
         $io->success('Done');

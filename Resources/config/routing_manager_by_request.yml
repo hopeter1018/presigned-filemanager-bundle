@@ -1,0 +1,23 @@
+hopeter1018_presigned_filemanager_get_presigned_url_allowed_parameters:
+  path:     /get-presigned-url-allowed-parameters
+  methods:   GET
+  defaults:
+    _controller: HoPeter1018PresignedFilemanagerBundle:ManagerByRequest:getManagerPresignedUrlAllowedParameters
+  requirements:
+    manager: .*
+
+hopeter1018_presigned_filemanager_get_presigned_url:
+  path:     /get-presigned-url
+  methods:   GET|POST
+  defaults:
+    _controller: HoPeter1018PresignedFilemanagerBundle:ManagerByRequest:getManagerPresignedUrl
+  requirements:
+    manager: .*
+
+hopeter1018_presigned_filemanager_uploadeded_meta:
+  path:     /post-uploaded-meta
+  methods:   POST
+  defaults:
+    _controller: HoPeter1018PresignedFilemanagerBundle:ManagerByRequest:postManagerUploadedMeta
+  requirements:
+    manager: .*

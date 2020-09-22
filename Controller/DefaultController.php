@@ -34,26 +34,44 @@ class DefaultController extends Controller
         return $this->render('HoPeter1018PresignedFilemanagerBundle:Default:index.html.twig');
     }
 
-    public function getPresignedUrlAllowedParametersAction(Request $request)
+    public function getPresignedUrlAllowedParametersAction(Request $request, string $manager)
     {
-        $manager = $this->getManager($request);
+        $manager = $this->getManager($manager);
+
+        return $this->_getPresignedUrlAllowedParametersAction($manager, $request);
+    }
+
+    public function getPresignedUrlAction(Request $request, string $manager)
+    {
+        $manager = $this->getManager($manager);
+
+        return $this->_getPresignedUrlAction($manager, $request);
+    }
+
+    public function postUploadedMetaAction(Request $request, string $manager)
+    {
+        $manager = $this->getManager($manager);
+
+        return $this->_postUploadedMetaAction($manager, $request);
+    }
+
+    protected function _getPresignedUrlAllowedParametersAction(ManagerInterface $manager, Request $request)
+    {
         $result = $manager->getAllowedParameters();
 
         return new JsonResponse($result);
     }
 
-    public function getPresignedUrlAction(Request $request)
+    protected function _getPresignedUrlAction(ManagerInterface $manager, Request $request)
     {
-        $manager = $this->getManager($request);
         $options = $service->sanitizePresign($request->isMethod('GET'), $request->request->all());
         $result = $service->presign($request->isMethod('GET'), $options);
 
         return new JsonResponse($result);
     }
 
-    public function postUploadedMetaAction(Request $request)
+    protected function _postUploadedMetaAction(ManagerInterface $manager, Request $request)
     {
-        $manager = $this->getManager($request);
         $options = $service->sanitizeUploaded($request->request->all());
         $result = $service->addRecord($options);
 
@@ -62,12 +80,12 @@ class DefaultController extends Controller
         ]);
     }
 
-    protected function getManager(Request $request)
+    protected function getManager(string $manager)
     {
-        $manager = $request->get('manager');
+        // $manager = $request->get('manager');
         $service = $this->managerRegistry->getByServiceId('ho_peter1018.presigned_filemanager.manager.'.$manager);
         if (null === $service) {
-            throw new NotFoundHttpException('Manager not found');
+            throw new NotFoundHttpException("Manager `{$manager}` not found");
         } else {
             return $service;
         }

@@ -1,6 +1,8 @@
 parameters:
   ho_peter1018.presigned_filemanager.signer.aws_s3_v3: 'HoPeter1018\PresignedFilemanagerBundle\Services\Signer\AwsS3V3Signer'
   ho_peter1018.presigned_filemanager.signer.local: 'HoPeter1018\PresignedFilemanagerBundle\Services\Signer\LocalSigner'
+  ho_peter1018.presigned_filemanager.manager.default: 'HoPeter1018\PresignedFilemanagerBundle\Services\Manager\DefaultManager'
+  ho_peter1018.presigned_filemanager.manager.null: 'HoPeter1018\PresignedFilemanagerBundle\Services\Manager\NullManager'
 
 services:
   _defaults:
@@ -16,6 +18,9 @@ services:
     resource: '../../Repository/*'
     tags: ['doctrine.repository_service']
 
+  HoPeter1018\PresignedFilemanagerBundle\Services\Manager\ManagerHelper:
+    class: HoPeter1018\PresignedFilemanagerBundle\Services\Manager\ManagerHelper
+
   HoPeter1018\PresignedFilemanagerBundle\Services\Manager\ManagerRegistry:
     class: HoPeter1018\PresignedFilemanagerBundle\Services\Manager\ManagerRegistry
 
@@ -26,3 +31,6 @@ services:
     class: HoPeter1018\PresignedFilemanagerBundle\Controller\DefaultController
     arguments:
       - "@event_dispatcher"
+
+  HoPeter1018\PresignedFilemanagerBundle\Routing\PresignedFilemanagerLoader:
+      tags: [routing.loader]

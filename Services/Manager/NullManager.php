@@ -6,7 +6,7 @@ namespace HoPeter1018\PresignedFilemanagerBundle\Services\Manager;
 
 use HoPeter1018\PresignedFilemanagerBundle\Event\Manager as Event;
 
-class DefaultManager extends AbstractManager implements ManagerInterface
+class NullManager extends AbstractManager implements ManagerInterface
 {
     public function sanitizeList(array $options)
     {
@@ -57,12 +57,6 @@ class DefaultManager extends AbstractManager implements ManagerInterface
         $this->eventDispatch(new Event\BeforePresignSanitizeEvent($isGet, $options));
 
         $result = [];
-        $allowedList = $isGet ? $this->allowedGetParameters : $this->allowedPostParameters;
-        foreach ($allowedList as $key => $isAllow) {
-            if ($isAllow and isset($options[$key])) {
-                $result[$key] = $options[$key];
-            }
-        }
 
         $this->eventDispatch(new Event\AfterPresignSanitizeEvent($isGet, $options, $result));
 
@@ -93,33 +87,12 @@ class DefaultManager extends AbstractManager implements ManagerInterface
 
     public function uploaded(array $options)
     {
-        $event = new Event\BeforeUploadedEvent($options);
-        $this->eventDispatch($event);
+        $this->eventDispatch(new Event\BeforeUploadedEvent($options));
 
-        $result = $this->newInstance();
-        foreach ($event->getProperties() as $name => $value) {
-            $this->setProp($result, $name, $value);
-        }
-        $this->em->persist($result);
-        $this->em->flush();
+        $result = [];
 
         $this->eventDispatch(new Event\AfterUploadedEvent($options, $result));
 
         return $result;
-    }
-
-    public function getClassMetadata()
-    {
-        return $this->em->getClassMetadata($this->entityFqcn);
-    }
-
-    public function newInstance()
-    {
-        return $this->getClassMetadata()->newInstance();
-    }
-
-    public function count()
-    {
-        return $this->em->getRepository($this->entityFqcn)->count([]);
     }
 }

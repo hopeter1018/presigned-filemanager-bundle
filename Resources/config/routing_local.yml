@@ -1,0 +1,13 @@
+hopeter1018_presigned_filemanager_local_uploaded:
+  path:     /local/post-upload
+  methods:   POST
+  defaults:
+    _controller: HoPeter1018PresignedFilemanagerBundle:Local:postUpload
+
+hopeter1018_presigned_filemanager_local_get:
+  path:     /local/get/{path}
+  methods:   GET
+  defaults:
+    _controller: HoPeter1018PresignedFilemanagerBundle:Local:get
+  requirements:
+    path: .+

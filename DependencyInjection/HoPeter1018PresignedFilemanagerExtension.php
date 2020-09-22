@@ -1,8 +1,14 @@
 <?php
 
+/*
+ * <hokwaichi@gmail.com>
+ */
+
+declare(strict_types=1);
+
 namespace HoPeter1018\PresignedFilemanagerBundle\DependencyInjection;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use HoPeter1018\PresignedFilemanagerBundle\Services\Manager\ManagerHelper;
 use HoPeter1018\PresignedFilemanagerBundle\Services\Manager\ManagerInterface;
 use HoPeter1018\PresignedFilemanagerBundle\Services\Signer\SignerInterface;
 use Symfony\Component\Config\FileLocator;
@@ -10,7 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -107,9 +112,8 @@ class HoPeter1018PresignedFilemanagerExtension extends Extension implements Prep
                 $definition = $container->register("ho_peter1018.presigned_filemanager.manager.{$key}", $managerClass)
                   ->addTag('ho_peter1018.presigned_filemanager.services.manager_pool');
 
-                $this->addDefinitionArgument($container, $definition, new Reference(EventDispatcherInterface::class));
+                $this->addDefinitionArgument($container, $definition, new Reference(ManagerHelper::class));
                 $this->addDefinitionArgument($container, $definition, new Reference('ho_peter1018.presigned_filemanager.signer.'.$manager['signer']));
-                $this->addDefinitionArgument($container, $definition, new Reference(ManagerRegistry::class));
                 $this->addDefinitionArgument($container, $definition, new Reference('doctrine.orm.'.$manager['connection'].'_entity_manager'));
                 $this->addDefinitionArgument($container, $definition, $manager['connection']);
                 $this->addDefinitionArgument($container, $definition, $manager['entity_class']);
@@ -127,7 +131,7 @@ class HoPeter1018PresignedFilemanagerExtension extends Extension implements Prep
 
     protected function addDefinitionArgument($container, &$definition, $argument)
     {
-        if (is_array($argument)) {
+        if (is_array($argument) or is_object($argument)) {
             $definition->addArgument($argument);
         } elseif (strstr($argument, '@')) {
             $definition->addArgument(new Reference(substr($argument, 1)));

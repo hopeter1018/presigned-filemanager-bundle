@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace HoPeter1018\PresignedFilemanagerBundle\DependencyInjection;
 
 use HoPeter1018\PresignedFilemanagerBundle\Entity\UploadedFile;
-use HoPeter1018\PresignedFilemanagerBundle\Services\Manager\DefaultManager;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -48,7 +47,7 @@ class Configuration implements ConfigurationInterface
                 ->children()
                   ->scalarNode('service')->end()
                   ->scalarNode('manager')
-                    ->defaultValue(DefaultManager::class)
+                    ->defaultValue('default')
                   ->end()
                   ->scalarNode('signer')
                     ->isRequired()

@@ -35,7 +35,7 @@ class LocalSigner implements SignerInterface
     {
         $options = $this->sanitizeOptions($options);
         $hash = $this->hash();
-        $url = $this->router->generate('hopeter1018_presigned_filemanager_local_post_upload', []);
+        $url = $this->router->generate('hopeter1018_presigned_filemanager_local_uploaded', []);
 
         return [
           'formAttributes' => [
