@@ -2,7 +2,6 @@
     "name": "hopeter1018/presigned-filemanager-bundle",
     "description": "",
     "keywords": ["Symfony", "Bundle", "File Manager", "AWS", "Presigned"],
-    "version": "1.0.0",
     "license": "MIT",
     "authors": [
         {
